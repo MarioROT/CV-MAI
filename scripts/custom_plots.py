@@ -6,6 +6,8 @@ from typing import List, Dict, Tuple
 import random
 from skimage import feature, segmentation
 from skimage.color import rgb2gray, rgba2rgb
+import numpy as np
+import warnings
 
 class custom_grids():
   """"
@@ -35,6 +37,7 @@ class custom_grids():
       self.cmap = cmap
       self.title_size = title_size
       self.use_grid_spec = use_grid_spec
+      self.len_imgs = 0
       self.fig = None
       self.axs = None
 
@@ -54,6 +57,7 @@ class custom_grids():
             self.axs.axis(self.axis)
           if self.titles:
             self.axs.set_title(self.titles[idx], fontsize=self.title_size)
+          self.len_imgs += 1
       elif self.rows <= 1 or self.cols <= 1:
         for idx, img in enumerate(self.imgs):
           self.axs[idx].imshow(img, cmap=self.cmap)
@@ -61,16 +65,17 @@ class custom_grids():
             self.axs[idx].axis(self.axis)
           if self.titles:
             self.axs[idx].set_title(self.titles[idx], fontsize= self.title_size)
+          self.len_imgs += 1
       else:
-        im_ind = 0
-        for row in range(self.rows):
-          for column in range(self.cols):
-            self.axs[row][column].imshow(self.imgs[im_ind], cmap=self.cmap)
-            if self.axis:
-              self.axs[row][column].axis(self.axis)
-            if self.titles:
-              self.axs[row][column].set_title(self.titles[im_ind], fontsize= self.title_size)
-            im_ind += 1
+        for idx, img in enumerate(self.imgs):
+          row = round(np.floor(self.len_imgs/self.cols))
+          column = self.len_imgs%self.cols
+          self.axs[row][column].imshow(img, cmap=self.cmap)
+          if self.axis:
+            self.axs[row][column].axis(self.axis)
+          if self.titles:
+            self.axs[row][column].set_title(self.titles[idx], fontsize= self.title_size)
+          self.len_imgs += 1
     else:
       self.fig = plt.figure(constrained_layout=True, figsize=self.figsize)
       gs = GridSpec(self.rows, self.cols, figure=self.fig)
@@ -84,4 +89,30 @@ class custom_grids():
           im.axis('off')
         if self.titles:
           im.set_title(self.titles[n], fontsize= self.title_size)
-  
+
+  def add_plot(self, title=None, axis=None, position=None):
+    if self.use_grid_spec:
+      warnings.warn("To add graphics you need to set 'use_grid_spec' to false when instantiating the class.")
+      return 0
+    if self.len_imgs >= (self.rows*self.cols):
+      warnings.warn("There is no space available to add a plot. Adjust the number of rows and columns when instantiating the class.")
+      return 0
+    if not position:
+      nextr = round(np.floor(self.len_imgs/self.cols))
+      nextc = self.len_imgs%self.cols
+      position = [nextr, nextc]
+
+    self.len_imgs += 1
+
+    if self.rows <= 1:
+      if axis:
+        self.axs[position[1]].axis(axis)
+      if title:
+        self.axs[position[1]].set_title(title, fontsize= self.title_size)
+      return self.axs[position[1]]
+    else:
+      if axis:
+        self.axs[position[0]][position[1]].axis(axis)
+      if title:
+        self.axs[position[0]][position[1]].set_title(title, fontsize= self.title_size)
+      return self.axs[position[0]][position[1]] 
