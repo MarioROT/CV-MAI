@@ -34,7 +34,7 @@ class custom_grids():
       self.axis = axis
       self.cmap = cmap
       self.title_size = title_size
-      self.use_gris_apec = use_grid_spec
+      self.use_grid_spec = use_grid_spec
       self.fig = None
       self.axs = None
 
@@ -45,7 +45,7 @@ class custom_grids():
     return len(self.imgs)
 
   def show(self):
-    if not self.use_gris_apec:
+    if not self.use_grid_spec:
       self.fig, self.axs = plt.subplots(self.rows, self.cols, figsize=self.figsize)
       if self.rows <= 1 and self.cols <= 1:
         for idx, img in enumerate(self.imgs):
