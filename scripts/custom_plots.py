@@ -129,4 +129,4 @@ class custom_grids():
         self.axs[position[0]][position[1]].axis(axis)
       if title:
         self.axs[position[0]][position[1]].set_title(title, fontsize= self.title_size)
-      return self.axs[position[0]][position[1]]     return self.axs[position[0]][position[1]]     return self.axs[position[0]][position[1]]     return self.axs[position[0]][position[1]] 
+      return self.axs[position[0]][position[1]] 
