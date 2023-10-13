@@ -47,7 +47,7 @@ class custom_grids():
   def __len__(self):
     return len(self.imgs)
 
-  def show(self):
+  def show(self): 
     if not self.use_grid_spec:
       self.fig, self.axs = plt.subplots(self.rows, self.cols, figsize=self.figsize)
       if self.rows <= 1 and self.cols <= 1:
@@ -90,7 +90,7 @@ class custom_grids():
         if self.titles:
           im.set_title(self.titles[n], fontsize= self.title_size)
 
-  def add_plot(self, title=None, axis=None, position=None):
+  def add_plot(self, title=None, axis=None, position=None, last=False):
     if self.use_grid_spec:
       warnings.warn("To add graphics you need to set 'use_grid_spec' to false when instantiating the class.")
       return 0
@@ -104,15 +104,29 @@ class custom_grids():
 
     self.len_imgs += 1
 
+    if last and (self.len_imgs < (self.rows*self.cols)):
+      for e in range((self.rows*self.cols)-self.len_imgs):
+        nextr = round(np.floor(self.len_imgs/self.cols))
+        nextc = self.len_imgs%self.cols
+        self.axs[nextr][nextc].axis("off")
+        self.len_imgs += 1
+
     if self.rows <= 1:
-      if axis:
-        self.axs[position[1]].axis(axis)
-      if title:
-        self.axs[position[1]].set_title(title, fontsize= self.title_size)
-      return self.axs[position[1]]
+      if self.cols <= 1:
+        if axis:
+          self.axs.axis(axis)
+        if title:
+          self.axs.set_title(title, fontsize= self.title_size)
+        return self.axs
+      else:
+        if axis:
+          self.axs[position[1]].axis(axis)
+        if title:
+          self.axs[position[1]].set_title(title, fontsize= self.title_size)
+        return self.axs[position[1]]
     else:
       if axis:
         self.axs[position[0]][position[1]].axis(axis)
       if title:
         self.axs[position[0]][position[1]].set_title(title, fontsize= self.title_size)
-      return self.axs[position[0]][position[1]] 
+      return self.axs[position[0]][position[1]]     return self.axs[position[0]][position[1]]     return self.axs[position[0]][position[1]]     return self.axs[position[0]][position[1]] 
