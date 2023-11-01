@@ -129,4 +129,27 @@ class custom_grids():
         self.axs[position[0]][position[1]].axis(axis)
       if title:
         self.axs[position[0]][position[1]].set_title(title, fontsize= self.title_size)
-      return self.axs[position[0]][position[1]] 
+      return self.axs[position[0]][position[1]]
+  
+  def overlay_image(self, img_idx, overlays, cmp_colors = None, alphas = None):
+    if not cmp_colors:
+      cmp_colors = [random.choice(plt.colormaps()) for i in range(len(img_idx))]
+    elif len(alphas) < len(img_idx):
+      cmp_colors = [cmp_colors[i%len(cmp_colors)] for i in range(len(img_idx))]
+    if not alphas:
+      alphas = [0.5 for i in range(len(img_idx))]
+    elif len(alphas) < len(img_idx):
+      alphas = [alphas[i%len(alphas)] for i in range(len(img_idx))]
+    if len(overlays) < len(img_idx):
+      overlays = [overlays[i%len(overlays)] for i in range(len(img_idx))]
+    for o_idx, i_idx in enumerate(img_idx):
+      if self.use_grid_spec:
+        self.fig.axes[i_idx].imshow(overlays[o_idx], cmap=cmp_colors[o_idx], alpha=alphas[o_idx])
+      elif self.cols == 1 and self.rows == 1:
+        self.axs.imshow(overlays[o_idx], cmap=cmp_colors[o_idx], alpha=alphas[o_idx])
+      elif self.cols == 1 or self.rows == 1:
+        self.axs[i_idx].imshow(overlays[o_idx], cmap=cmp_colors[o_idx], alpha=alphas[o_idx])
+      else:
+        nextr = round(np.floor(i_idx/self.cols))
+        nextc = i_idx%self.cols
+        self.axs[nextr][nextc].imshow(overlays[o_idx], cmap=cmp_colors[o_idx], alpha=alphas[o_idx])
