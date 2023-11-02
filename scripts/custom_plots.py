@@ -153,3 +153,16 @@ class custom_grids():
         nextr = round(np.floor(i_idx/self.cols))
         nextc = i_idx%self.cols
         self.axs[nextr][nextc].imshow(overlays[o_idx], cmap=cmp_colors[o_idx], alpha=alphas[o_idx])
+
+  def add_rects(self, img_idx, rects, rect_clrs = None, linewidth=1, facecolor=False):
+    if not rect_clrs:
+      rect_clrs = [random.choice(list(mcolors.CSS4_COLORS.keys())) for i in range(len(rects[0]))]
+    if facecolor:
+      face_clrs = rect_clrs.copy()
+    else:
+      face_clrs  = ['none' for i in range(len(rects[0]))]
+    for i_idx, img in enumerate(rects):
+      for r_idx,rect in enumerate(img):
+        rect = patches.Rectangle(rect[0], rect[1], rect[2], linewidth=linewidth, edgecolor=rect_clrs[r_idx],
+                               facecolor=face_clrs[r_idx])
+        self.fig.axes[img_idx[i_idx]].add_patch(rect)
