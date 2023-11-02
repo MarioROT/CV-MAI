@@ -4,6 +4,7 @@ import matplotlib.patches as patches
 import matplotlib.colors as mcolors
 from typing import List, Dict, Tuple
 import random
+from utils import get_ORB
 from skimage import feature, segmentation
 from skimage.color import rgb2gray, rgba2rgb
 import numpy as np
@@ -166,3 +167,40 @@ class custom_grids():
         rect = patches.Rectangle(rect[0], rect[1], rect[2], linewidth=linewidth, edgecolor=rect_clrs[r_idx],
                                facecolor=face_clrs[r_idx])
         self.fig.axes[img_idx[i_idx]].add_patch(rect)
+
+  def match_points(self, img_idx, matches_idxs, autoTitles = None):
+    kps1_l, kps2_l, mts_l = [], [], []
+    img = self.grayChecker(self.imgs[img_idx])
+    match_imgs = [self.grayChecker(self.imgs[idx]) for idx in matches_idxs]
+
+    for match in match_imgs:
+      kp1, kp2, matches = get_ORB(img, match)
+      kps1_l.append(kp1)
+      kps2_l.append(kp2)
+      mts_l.append(matches)
+
+    self.fig = plt.figure(constrained_layout=True, figsize=self.figsize)
+    gs = GridSpec(self.rows, self.cols, figure=self.fig)
+    for n, (i, j) in enumerate(zip(match_imgs, self.order)):
+      im = self.fig.add_subplot(gs[j[0], j[1][0]:j[1][1]])
+      feature.plot_matches(im, img, i, kps1_l[n], keypoints2_l[n], mts_l[n])
+      if self.axis:
+        im.axis('off')
+      if self.titles:
+        im.set_title(self.titles[n], fontsize= self.title_size)
+      if autoTitles:
+        if autoTitles == True:
+          im.set_title('Matches: ' + str(mts_l[n].shape[0]), fontsize= self.title_size)
+        else:
+          im.set_title(autoTitles[n] + ' - Matches: ' + str(mts_l[n].shape[0]), fontsize= self.title_size)
+
+  @staticmethod
+  def grayChecker(color_img):
+    if len(color_img.shape) == 2:
+      gray_img = color_img
+    elif color_img.shape[2] == 3:
+      gray_img = rgb2gray(color_img)
+    elif color_img.shape[2] == 4:
+      gray_img = rgb2gray(rgba2rgb(color_img))
+
+    return gray_img
