@@ -183,7 +183,7 @@ class custom_grids():
     gs = GridSpec(self.rows, self.cols, figure=self.fig)
     for n, (i, j) in enumerate(zip(match_imgs, self.order)):
       im = self.fig.add_subplot(gs[j[0], j[1][0]:j[1][1]])
-      feature.plot_matches(im, img, i, kps1_l[n], keypoints2_l[n], mts_l[n])
+      feature.plot_matches(im, img, i, kps1_l[n], kps2_l[n], mts_l[n])
       if self.axis:
         im.axis('off')
       if self.titles:
