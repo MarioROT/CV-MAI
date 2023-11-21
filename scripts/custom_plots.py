@@ -96,7 +96,7 @@ class custom_grids():
         if self.titles:
           im.set_title(self.titles[n], fontsize= self.title_size)
 
-  def add_plot(self, title=None, axis=None, position=None, last=False):
+  def add_plot(self, title=None, axis=None, position=None, last=False, row_last=False, projection=False, clear_ticks=None, axlabels=None):
     if self.use_grid_spec:
       warnings.warn("To add graphics you need to set 'use_grid_spec' to false when instantiating the class.")
       return 0
@@ -107,8 +107,54 @@ class custom_grids():
       nextr = round(np.floor(self.len_imgs/self.cols))
       nextc = self.len_imgs%self.cols
       position = [nextr, nextc]
-
+    
     self.len_imgs += 1
+
+    if projection:
+        self.axs[nextr][nextc].remove()
+        self.axs[nextr][nextc] = self.fig.add_subplot(self.rows,self.cols,self.len_imgs,projection='3d')
+        if clear_ticks:
+            self.axs[nextr][nextc].zaxis.set_ticklabels([])
+        if axlabels:
+            self.axs[nextr][nextc].set_zlabel(axlabels[2])        
+        
+    if self.rows <= 1 and self.cols<=1:
+      if clear_ticks:
+        self.axs.xaxis.set_ticklabels([])
+        self.axs.yaxis.set_ticklabels([])
+      if axlabels:
+        self.axs.set_xlabel(axlabels[0])
+        self.axs.set_ylabel(axlabels[1])
+    elif self.rows <= 1:
+      if clear_ticks:
+        self.axs[position[1]].xaxis.set_ticklabels([])
+        self.axs[position[1]].yaxis.set_ticklabels([])
+      if axlabels:
+        self.axs[position[1]].set_xlabel(axlabels[0])
+        self.axs[position[1]].set_ylabel(axlabels[1])
+    elif self.cols <=1:
+      if clear_ticks:
+        self.axs[position[0]].xaxis.set_ticklabels([])
+        self.axs[position[0]].yaxis.set_ticklabels([])
+      if axlabels:
+        self.axs[position[0]].set_xlabel(axlabels[0])
+        self.axs[position[0]].set_ylabel(axlabels[1])     
+    else:
+      if clear_ticks:
+        self.axs[nextr][nextc].xaxis.set_ticklabels([])
+        self.axs[nextr][nextc].yaxis.set_ticklabels([])
+      if axlabels:
+        self.axs[nextr][nextc].set_xlabel(axlabels[0])
+        self.axs[nextr][nextc].set_ylabel(axlabels[1])
+    
+    
+  
+    if row_last and (nextc < self.cols):
+      for e in range(self.cols-(nextc+1)):
+        nextr = round(np.floor(self.len_imgs/self.cols))
+        nextc = self.len_imgs%self.cols
+        self.axs[nextr][nextc].axis("off")
+        self.len_imgs += 1
 
     if last and (self.len_imgs < (self.rows*self.cols)):
       for e in range((self.rows*self.cols)-self.len_imgs):
@@ -117,19 +163,25 @@ class custom_grids():
         self.axs[nextr][nextc].axis("off")
         self.len_imgs += 1
 
-    if self.rows <= 1:
-      if self.cols <= 1:
-        if axis:
-          self.axs.axis(axis)
-        if title:
-          self.axs.set_title(title, fontsize= self.title_size)
-        return self.axs
-      else:
-        if axis:
-          self.axs[position[1]].axis(axis)
-        if title:
-          self.axs[position[1]].set_title(title, fontsize= self.title_size)
-        return self.axs[position[1]]
+
+    if self.rows <= 1 and self.cols<=1:
+      if axis:
+        self.axs.axis(axis)
+      if title:
+        self.axs.set_title(title, fontsize= self.title_size)
+      return self.axs
+    elif self.rows <= 1:
+      if axis:
+        self.axs[position[1]].axis(axis)
+      if title:
+        self.axs[position[1]].set_title(title, fontsize= self.title_size)
+      return self.axs[position[1]]
+    elif self.cols <= 1:
+      if axis:
+        self.axs[position[0]].axis(axis)
+      if title:
+        self.axs[position[0]].set_title(title, fontsize= self.title_size)
+      return self.axs[position[0]]
     else:
       if axis:
         self.axs[position[0]][position[1]].axis(axis)
