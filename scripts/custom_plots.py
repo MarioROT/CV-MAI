@@ -374,3 +374,62 @@ def groupedBarPlot(data, xticks, title,legend=True,axislabels = False,width=0.35
         plt.savefig(pdf + '.pdf', transparent=True)
 
     plt.show()
+
+def plot_confusion_matrix(cm, classes, figsize= (10,10), normalize=False,colors = None,tit = False, axisLabels=False,fsizes = False, png = False, pdf = False):
+    if fsizes:
+        for key,size in fsizes.items():
+            if key == 'font':
+                plt.rc(key, size=size)
+            elif key == 'axes':
+                plt.rc(key, titlesize=size)
+                plt.rc(key, labelsize=size)
+            elif key in ['xtick','ytick']:
+                plt.rc(key, labelsize=size)
+            elif key == 'legend':
+                plt.rc(key, fontsize=size)
+            elif key == 'figure':
+                plt.rc(key, titlesize=size)
+    else:
+        plt.rc('font', size=15)
+
+    if normalize:
+        cm = cm.astype('float')/cm.sum(axis=1)[:,np.newaxis]
+        if tit:
+            title, fmt = tit, '.2f'
+        else:
+            title, fmt = 'Normalized confusion matrix', '.2f'
+    else:
+        if tit:
+            title, fmt = tit, 'd'
+        else:
+            title, fmt = 'Confusion matrix without normalization', 'd'
+        cm = cm.astype(int)
+    plt.figure(figsize=figsize)
+    if colors:
+        plt.imshow(cm, interpolation='nearest', cmap = colors)
+    else:
+        plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
+    plt.title(title)
+    plt.colorbar(shrink=0.75)
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=45)
+    plt.yticks(tick_marks, classes)
+    thresh = cm.max()/2.
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+#         print(j, i, format(cm[i, j]), fmt)
+        plt.text(j, i, format(cm[i, j], fmt),horizontalalignment="center",
+                 color="white" if cm[i, j] > thresh else "black")
+    plt.tight_layout()
+    if axisLabels:
+        plt.ylabel(axisLabels[0])
+        plt.xlabel(axisLabels[1])
+    else:
+        plt.ylabel('True Class, yt')
+        plt.xlabel('Predicted Class, y')
+
+    if png:
+        plt.savefig(png + '.png', transparent=True, bbox_inches='tight')
+    if pdf:
+        plt.savefig(pdf + '.pdf', transparent=True, bbox_inches='tight')
+
+    plt.show()
